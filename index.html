@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminder App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app-container">
+        
+        <div id="sidebar">
+            <button id="view-reminders-btn" class="sidebar-btn active">View Reminders</button>
+            <button id="new-reminder-btn" class="sidebar-btn">New Reminder</button>
+        </div>
+
+        <div id="content">
+            <div id="reminders-list" class="view-section active">
+                <h1>All Reminders</h1>
+                <ul id="reminders"></ul>
+            </div>
+    
+            <div id="new-reminder" class="view-section">
+                <h1 class = "form-header">Create New Reminder</h1>
+                <form id="reminder-form">
+                    <label for="reminder-title">Title</label>
+                    <input type="text" id="reminder-title" required />
+    
+                    <label for="reminder-description">Description</label>
+                    <textarea id="reminder-description" required></textarea>
+    
+                    <label for="reminder-date">Date</label>
+                    <input type="date" id="reminder-date" required />
+    
+                    <label for="reminder-time">Time</label>
+                    <input type="time" id="reminder-time" required />
+    
+                    <button type="submit">Save Reminder</button>
+                </form>
+            </div>
+            
+        </div>           
+    </div>
+    
+    <script src="renderer.js"></script>
+</body>
+
+</html>
