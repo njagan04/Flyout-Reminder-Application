@@ -10,40 +10,56 @@
 
 <body>
     <div id="app-container">
-        
+        <!-- Sidebar -->
         <div id="sidebar">
             <button id="view-reminders-btn" class="sidebar-btn active">View Reminders</button>
             <button id="new-reminder-btn" class="sidebar-btn">New Reminder</button>
         </div>
 
+        <!-- Main Content -->
         <div id="content">
+            <!-- View Reminders Section -->
             <div id="reminders-list" class="view-section active">
                 <h1>All Reminders</h1>
-                <ul id="reminders"></ul>
+                <ul id="reminders">
+                    <!-- Dynamically rendered reminder cards -->
+                </ul>
             </div>
-    
+            
+            
+            
+            
+
+            <!-- New Reminder Section -->
             <div id="new-reminder" class="view-section">
-                <h1 class = "form-header">Create New Reminder</h1>
+                <h1 class="form-header">Create New Reminder</h1>
                 <form id="reminder-form">
                     <label for="reminder-title">Title</label>
                     <input type="text" id="reminder-title" required />
-    
+
                     <label for="reminder-description">Description</label>
                     <textarea id="reminder-description" required></textarea>
-    
+
                     <label for="reminder-date">Date</label>
                     <input type="date" id="reminder-date" required />
-    
+
                     <label for="reminder-time">Time</label>
                     <input type="time" id="reminder-time" required />
-    
+
+                    <label for="reminder-tag-dropdown">Tag</label>
+                    <select id="reminder-tag-dropdown">
+                        <option value="">Select a Tag</option>
+                        <!-- Dynamically populated options -->
+                    </select>
+
                     <button type="submit">Save Reminder</button>
                 </form>
             </div>
             
-        </div>           
+
+        </div>
     </div>
-    
+
     <script src="renderer.js"></script>
 </body>
 

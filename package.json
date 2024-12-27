@@ -11,5 +11,8 @@
   "description": "",
   "devDependencies": {
     "electron": "^33.2.1"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7"
   }
 }

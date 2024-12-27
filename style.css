@@ -122,7 +122,7 @@ form button:hover {
 /* Reminders List */
 #reminders {
     list-style: none;
-    padding: 0;
+    padding-bottom: 500px;
 }
 
 #reminders li {
@@ -262,7 +262,7 @@ button.toggle-status:hover {
 /* Reminders List */
 #reminders {
     list-style: none;
-    padding: 0;
+    padding-bottom: 80px;
 }
 
 #reminders li {
