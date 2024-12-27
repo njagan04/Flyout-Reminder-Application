@@ -130,7 +130,6 @@ reminderForm.addEventListener('submit', async (e) => {
     isEditing = false;
 });
 
-
 // Add event listeners for reminder actions
 function addReminderEventListeners(reminderItem) {
     const editButton = reminderItem.querySelector('.edit');
@@ -151,7 +150,7 @@ function addReminderEventListeners(reminderItem) {
             document.querySelector('.form-header').textContent = 'Modify Reminder';
             newReminderSection.classList.add('active');
             remindersListSection.classList.remove('active');
-        }   
+        }
     });
 
     deleteButton.addEventListener('click', async () => {
@@ -198,7 +197,59 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// Tag dropdown functionality
+// Search and filter functionality
+
+// Get search input and status filter dropdown
+const searchBar = document.getElementById('search-bar');
+const statusFilter = document.getElementById('status-filter');
+
+// Add event listeners for search and status filter
+searchBar.addEventListener('input', filterReminders);
+statusFilter.addEventListener('change', filterReminders);
+
+// Filter reminders based on search query and selected status
+function filterReminders() {
+    const searchQuery = searchBar.value.toLowerCase();
+    const selectedStatus = statusFilter.value;
+
+    const reminders = [...remindersList.children];
+    reminders.forEach(reminder => {
+        const title = reminder.querySelector('h3').textContent.toLowerCase();
+        const description = reminder.querySelector('.reminder-description').textContent.toLowerCase();
+        const status = reminder.querySelector('.reminder-status').textContent.toLowerCase();
+
+        const matchesSearch = title.includes(searchQuery) || description.includes(searchQuery);
+        const matchesStatus = selectedStatus ? status.includes(selectedStatus) : true;
+
+        // Show the reminder and dim it if it doesn't match the status filter
+        if (matchesSearch && matchesStatus) {
+            reminder.style.display = '';
+            reminder.classList.remove('dimmed');
+        } else if (matchesSearch) {
+            reminder.style.display = '';
+            reminder.classList.add('dimmed');
+        } else {
+            reminder.style.display = 'none';
+            reminder.classList.remove('dimmed');
+        }
+    });
+}
+
+// Get the reset icon element
+const resetIcon = document.getElementById('reset-icon');
+
+// Add event listener to the reset icon to clear search bar and reset filter dropdown
+resetIcon.addEventListener('click', () => {
+    // Reset the search bar
+    searchBar.value = '';
+
+    // Reset the filter dropdown
+    statusFilter.value = '';
+
+    // Reapply the filter so that all reminders are visible again
+    filterReminders();
+});
+
 
 // Initialize the app
 initializeReminders();

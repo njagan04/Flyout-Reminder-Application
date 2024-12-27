@@ -19,8 +19,22 @@
         <!-- Main Content -->
         <div id="content">
             <!-- View Reminders Section -->
+            
+            <!-- Add this inside the <div id="content">, above the reminders list -->
+            
             <div id="reminders-list" class="view-section active">
                 <h1>All Reminders</h1>
+                <div id="search-container">
+                    <input type="text" id="search-bar" placeholder="Search Reminders..." />
+                
+                    <!-- Filter section, change the tag dropdown to status filter dropdown -->
+                    <select id="status-filter" title="status-filter">
+                        <option value="">All States</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                <span id="reset-icon" class="reset-icon">&#10006;</span>
+                </div>
                 <ul id="reminders">
                     <!-- Dynamically rendered reminder cards -->
                 </ul>
@@ -45,13 +59,7 @@
 
                     <label for="reminder-time">Time</label>
                     <input type="time" id="reminder-time" required />
-
-                    <label for="reminder-tag-dropdown">Tag</label>
-                    <select id="reminder-tag-dropdown">
-                        <option value="">Select a Tag</option>
-                        <!-- Dynamically populated options -->
-                    </select>
-
+                    
                     <button type="submit">Save Reminder</button>
                 </form>
             </div>
