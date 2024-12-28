@@ -29,13 +29,32 @@ viewRemindersButton.addEventListener('click', () => {
 });
 
 newReminderButton.addEventListener('click', () => {
-    confirmSwitchSection(() => {
-        remindersListSection.classList.remove('active');
-        newReminderSection.classList.add('active');
-        document.querySelector('.form-header').textContent = 'Create New Reminder';
-        resetForm();
-    });
+    // Reset the form for creating a new reminder
+    resetForm();
+
+    // Switch to the create form
+    document.querySelector('.form-header').textContent = 'Create New Reminder';
+    newReminderSection.classList.add('active');
+    remindersListSection.classList.remove('active');
 });
+
+function resetForm() {
+    reminderForm.reset();
+    submitButton.textContent = 'Save Reminder';
+    editingReminder = null;
+    isEditing = false;
+
+    // Ensure fields are enabled when creating a new reminder
+    reminderTitle.removeAttribute('readonly');
+    reminderTitle.removeAttribute('disabled');
+    reminderDescription.removeAttribute('readonly');
+    reminderDescription.removeAttribute('disabled');
+    
+    reminderTitle.value = '';
+    reminderDescription.value = '';
+    reminderDate.value = '';
+    reminderTime.value = '';
+}
 
 // Reset form for creating a new reminder
 function resetForm() {
@@ -72,9 +91,10 @@ function addReminderToDOM(reminder) {
 
     reminderItem.innerHTML = `
         <h3>${reminder.title}</h3>
+        <p class="reminder-description">${reminder.description}</p>
         <p>Date: ${reminder.date}</p>
         <p>Time: ${reminder.time}</p>
-        <p class="reminder-description">${reminder.description}</p>
+        
         <div class="reminder-status ${reminder.status}">${capitalize(reminder.status)}</div>
         <div class="reminder-actions">
             <button class="edit">Edit</button>
@@ -139,11 +159,34 @@ function addReminderEventListeners(reminderItem) {
     editButton.addEventListener('click', () => {
         const isConfirmed = confirm('Are you sure you want to edit this reminder?');
         if (isConfirmed) {
-            reminderTitle.value = reminderItem.querySelector('h3').textContent;
-            reminderDescription.value = reminderItem.querySelector('.reminder-description').textContent;
-            reminderDate.value = reminderItem.querySelector('p:nth-child(2)').textContent.split(': ')[1];
-            reminderTime.value = reminderItem.querySelector('p:nth-child(3)').textContent.split(': ')[1];
+            
+            console.log('Before editing: ', reminderTitle, reminderDescription);
+            const titleElement = reminderItem.querySelector('h3');
+            const descriptionElement = reminderItem.querySelector('.reminder-description');
+            console.log(reminderTitle.hasAttribute('readonly')); // Should return false when editing
+            console.log(reminderDescription.hasAttribute('readonly')); // Should return false when editing
 
+            // Pre-populate the form with current values
+            reminderTitle.value = titleElement.textContent;
+            reminderDescription.value = descriptionElement.textContent;
+            
+            console.log(reminderTitle.hasAttribute('readonly')); // Should return false when editing
+            console.log(reminderDescription.hasAttribute('readonly')); 
+            
+            reminderDate.value = reminderItem.querySelector('p:nth-of-type(2)').textContent.split(': ')[1];
+            reminderTime.value = reminderItem.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
+
+            // Enable the fields for editing
+            reminderTitle.removeAttribute('readonly');
+            reminderTitle.removeAttribute('disabled');
+            reminderDescription.removeAttribute('readonly');
+            reminderDescription.removeAttribute('disabled');
+
+            // Focus on the title and description fields
+            reminderTitle.focus();
+            reminderDescription.focus();
+
+            // Switch form mode to editing
             editingReminder = reminderItem;
             isEditing = true;
             submitButton.textContent = 'Save Changes';
@@ -151,7 +194,14 @@ function addReminderEventListeners(reminderItem) {
             newReminderSection.classList.add('active');
             remindersListSection.classList.remove('active');
         }
+        else {
+            newReminderSection.classList.remove('active');
+            remindersListSection.classList.add('active');
+        }
     });
+
+
+
 
     deleteButton.addEventListener('click', async () => {
         if (confirm('Are you sure you want to delete this reminder?')) {
@@ -251,5 +301,8 @@ resetIcon.addEventListener('click', () => {
 });
 
 
+
+
 // Initialize the app
 initializeReminders();
+    

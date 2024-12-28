@@ -14,10 +14,11 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false, // Ensure this is set to false to allow `require` in renderer.js
+            disableBlinkFeatures: 'Autofill',
         },
     });
 
-    mainWindow.loadURL('C:/Zenith/GitHub/ModerFlyoutReminder/index.html');  // Or load your local HTML file
+    mainWindow.loadURL('file://' + __dirname + '/index.html');  // Or load your local HTML file
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });
