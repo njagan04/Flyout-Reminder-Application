@@ -1,38 +1,84 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Menu, Tray } = require('electron');
 const path = require('path');
 const db = require('./database'); // Import the SQLite database module
 
-
 let mainWindow;
+let tray;
 
-console.log(`Main window : `, mainWindow);
-
-function createWindow() {
-    const { width, height } = require('electron').screen.getPrimaryDisplay().workAreaSize;
+function createWindow(isVisible = true) {
+    const { height } = screen.getPrimaryDisplay().workAreaSize;
     mainWindow = new BrowserWindow({
         width: 800,
         height: 700,
         x: 30,
         y: height - 800,
+        show: isVisible, // Determines whether to show the window on creation
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false, // Ensure this is set to false to allow `require` in renderer.js
+            contextIsolation: false,
             disableBlinkFeatures: 'Autofill',
         },
     });
 
-    mainWindow.loadURL('file://' + __dirname + '/index.html');  // Or load your local HTML file
-    mainWindow.once('ready-to-show', () => {
-        mainWindow.show();
+    mainWindow.loadURL('file://' + __dirname + '/index.html');
+
+    mainWindow.on('minimize', (event) => {
+        event.preventDefault();
+        mainWindow.hide(); // Hide instead of minimizing
+    });
+
+    mainWindow.on('close', (event) => {
+        if (!app.isQuiting) {
+            event.preventDefault();
+            mainWindow.hide(); // Hide instead of closing
+        }
     });
 }
 
+function createTray() {
+    tray = new Tray(path.join(__dirname, 'icon.png')); // Replace with your tray icon
+    tray.setToolTip('My Reminder App');
 
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Show App',
+            click: () => {
+                if (mainWindow) {
+                    mainWindow.show();
+                    mainWindow.focus();
+                }
+            },
+        },
+        {
+            label: 'Exit',
+            click: () => {
+                app.isQuiting = true;
+                app.quit();
+            },
+        },
+    ]);
 
+    tray.setContextMenu(contextMenu);
 
-app.whenReady().then(createWindow);
+    // Add a click handler to show the app directly
+    tray.on('click', () => {
+        if (mainWindow) {
+            mainWindow.show();
+            mainWindow.focus();
+        }
+    });
+}
 
+app.whenReady().then(() => {
+    createWindow(false); // Initially hidden
+    createTray();
 
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -40,24 +86,19 @@ app.on('window-all-closed', () => {
     }
 });
 
-// Add this IPC handler to focus the window when requested
+// IPC Handlers
 ipcMain.handle('focus-window', () => {
-    console.log(`focus-window event received in main process`)
     if (mainWindow) {
-        console.log(`Attemnpting to focus the main window`)
-        //mainWindow.focus();  // Focus the main window when triggered
-        mainWindow.show(); // Bring the window to the front
-        mainWindow.setAlwaysOnTop(true); // Keep it on top
-        mainWindow.focus(); // Attempt to focus
-        mainWindow.setAlwaysOnTop(false); 
-        console.log(`window focused `)
+        mainWindow.show();
+        mainWindow.setAlwaysOnTop(true); // Bring the window to the front
+        mainWindow.focus();
+        mainWindow.setAlwaysOnTop(false);
     } else {
         console.error('No main window found.');
     }
 });
 
-
-// IPC Handlers for Database Operations
+// Database Operations Handlers (no changes here)
 
 // Fetch all reminders
 ipcMain.handle('get-reminders', async () => {
