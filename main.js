@@ -1,8 +1,11 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 const db = require('./database'); // Import the SQLite database module
 
+
 let mainWindow;
+
+console.log(`Main window : `, mainWindow);
 
 function createWindow() {
     const { width, height } = require('electron').screen.getPrimaryDisplay().workAreaSize;
@@ -24,13 +27,35 @@ function createWindow() {
     });
 }
 
+
+
+
 app.whenReady().then(createWindow);
+
+
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
+
+// Add this IPC handler to focus the window when requested
+ipcMain.handle('focus-window', () => {
+    console.log(`focus-window event received in main process`)
+    if (mainWindow) {
+        console.log(`Attemnpting to focus the main window`)
+        //mainWindow.focus();  // Focus the main window when triggered
+        mainWindow.show(); // Bring the window to the front
+        mainWindow.setAlwaysOnTop(true); // Keep it on top
+        mainWindow.focus(); // Attempt to focus
+        mainWindow.setAlwaysOnTop(false); 
+        console.log(`window focused `)
+    } else {
+        console.error('No main window found.');
+    }
+});
+
 
 // IPC Handlers for Database Operations
 

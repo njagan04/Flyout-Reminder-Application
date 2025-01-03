@@ -19,30 +19,22 @@
         <!-- Main Content -->
         <div id="content">
             <!-- View Reminders Section -->
-            
-            <!-- Add this inside the <div id="content">, above the reminders list -->
-            
             <div id="reminders-list" class="view-section active">
                 <h1>All Reminders</h1>
                 <div id="search-container">
                     <input type="text" id="search-bar" placeholder="Search Reminders..." />
-                
                     <!-- Filter section, change the tag dropdown to status filter dropdown -->
                     <select id="status-filter" title="status-filter">
                         <option value="">All States</option>
                         <option value="ongoing">Ongoing</option>
                         <option value="completed">Completed</option>
                     </select>
-                <span id="reset-icon" class="reset-icon">&#10006;</span>
+                    <span id="reset-icon" class="reset-icon">&#10006;</span>
                 </div>
                 <ul id="reminders">
                     <!-- Dynamically rendered reminder cards -->
                 </ul>
             </div>
-            
-            
-            
-            
 
             <!-- New Reminder Section -->
             <div id="new-reminder" class="view-section">
@@ -59,14 +51,27 @@
 
                     <label for="reminder-time">Time</label>
                     <input type="time" id="reminder-time" required />
-                    
+
                     <button type="submit">Save Reminder</button>
                 </form>
             </div>
-            
-
         </div>
     </div>
+
+    <!-- Modal for Editing/Confirming Reminder -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="modal-close" class="modal-close">&#10006;</span>
+            <h2>Are you sure?</h2>
+            <p>Do you want to edit or delete this reminder?</p>
+            <div class="modal-actions">
+                <button id="confirm-edit">Confirm Edit</button>
+                <button id="confirm-delete">Confirm Delete</button>
+                <button id="cancel-action">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
 
     <script src="renderer.js"></script>
 </body>

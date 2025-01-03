@@ -1,5 +1,9 @@
 const { ipcRenderer } = require('electron');
 
+//const { ipcRenderer } = require('electron');
+
+
+
 // Variables for form elements and sections
 const reminderForm = document.getElementById('reminder-form');
 const reminderTitle = document.getElementById('reminder-title');
@@ -16,8 +20,49 @@ const viewRemindersButton = document.getElementById('view-reminders-btn');
 const newReminderButton = document.getElementById('new-reminder-btn');
 
 // Store the currently editing reminder
-let editingReminder = null;
+let editingReminder = null; 
 let isEditing = false;
+
+//const { ipcRenderer } = require('electron');
+
+function scheduleNotification(reminder) {
+    const reminderDateTime = new Date(`${reminder.date}T${reminder.time}`);
+    const currentTime = new Date();
+
+    if (reminderDateTime > currentTime) {
+        const delay = reminderDateTime - currentTime;
+        setTimeout(() => {
+            const notification = new Notification(reminder.title, {
+                body: reminder.description || 'Reminder Notification',
+            });
+
+            // When the notification is clicked, send an IPC message to focus the app window
+            // Call the focus-window event when the notification is clicked
+            notification.onclick = async () => {
+                console.log(`Notification clicked !`)
+                try {
+                    const result = await ipcRenderer.invoke('focus-window');
+                    console.log(`focus window result :`, result);
+                } catch (error) {
+                    console.error('Error invoking focus-window:', error);
+                }
+            };
+        }, delay);
+    } else {
+        console.warn("Reminder time has already passed!");
+    }
+}
+
+
+// Request notification permissions
+if (Notification.permission === 'default') {
+    Notification.requestPermission().then((permission) => {
+        if (permission !== 'granted') {
+            console.error('Notification permissions were not granted.');
+        }
+    });
+}
+
 
 // Toggle between "View Reminders" and "New Reminder" sections
 viewRemindersButton.addEventListener('click', () => {
@@ -29,10 +74,8 @@ viewRemindersButton.addEventListener('click', () => {
 });
 
 newReminderButton.addEventListener('click', () => {
-    // Reset the form for creating a new reminder
     resetForm();
 
-    // Switch to the create form
     document.querySelector('.form-header').textContent = 'Create New Reminder';
     newReminderSection.classList.add('active');
     remindersListSection.classList.remove('active');
@@ -44,7 +87,6 @@ function resetForm() {
     editingReminder = null;
     isEditing = false;
 
-    // Ensure fields are enabled when creating a new reminder
     reminderTitle.removeAttribute('readonly');
     reminderTitle.removeAttribute('disabled');
     reminderDescription.removeAttribute('readonly');
@@ -56,7 +98,6 @@ function resetForm() {
     reminderTime.value = '';
 }
 
-// Reset form for creating a new reminder
 function resetForm() {
     reminderForm.reset();
     submitButton.textContent = 'Save Reminder';
@@ -64,7 +105,6 @@ function resetForm() {
     isEditing = false;
 }
 
-// Confirm before switching sections
 function confirmSwitchSection(callback) {
     if (isEditing) {
         const confirmSwitch = confirm('You have unsaved changes. Do you want to discard them and switch?');
@@ -80,7 +120,10 @@ function confirmSwitchSection(callback) {
 async function initializeReminders() {
     const reminders = await ipcRenderer.invoke('get-reminders');
     remindersList.innerHTML = '';
-    reminders.forEach(addReminderToDOM);
+    reminders.forEach(reminder => {
+        addReminderToDOM(reminder);
+        scheduleNotification(reminder); // Schedule notification for existing reminders
+    });
 }
 
 // Add reminder to the DOM
@@ -122,7 +165,6 @@ reminderForm.addEventListener('submit', async (e) => {
     }
 
     if (editingReminder) {
-        // Update existing reminder
         const updatedReminder = {
             id: editingReminder.dataset.id,
             title,
@@ -134,14 +176,15 @@ reminderForm.addEventListener('submit', async (e) => {
         await ipcRenderer.invoke('update-reminder', updatedReminder);
         editingReminder.remove();
         addReminderToDOM(updatedReminder);
+        scheduleNotification(updatedReminder); // Reschedule notification for updated reminder
 
         editingReminder = null;
         submitButton.textContent = 'Save Reminder';
     } else {
-        // Add new reminder
         const newReminder = { title, description, date, time };
         const savedReminder = await ipcRenderer.invoke('add-reminder', newReminder);
         addReminderToDOM(savedReminder);
+        scheduleNotification(savedReminder); // Schedule notification for new reminder
     }
 
     resetForm();
@@ -150,6 +193,15 @@ reminderForm.addEventListener('submit', async (e) => {
     isEditing = false;
 });
 
+// Remaining code stays the same...
+// Add event listeners for reminder actions
+// Search and filter functionality
+// Other utility functions
+
+// Initialize the app
+//initializeReminders();
+
+// -----------------------------------------------------------------------------------------
 // Add event listeners for reminder actions
 function addReminderEventListeners(reminderItem) {
     const editButton = reminderItem.querySelector('.edit');
